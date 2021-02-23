@@ -4,6 +4,7 @@ import 'package:test/test.dart';
 import 'package:faker/faker.dart';
 
 import 'package:ForDev/infra/http/http.dart';
+import 'package:ForDev/domain/helpers/helpers.dart';
 
 class ClientSpy extends Mock implements Client {}
 
@@ -26,6 +27,7 @@ void main() {
     setUp(() {
       mockResponse(200);
     });
+
     test('Should call post with correct values', () async {
       await sut
           .request(url: url, method: 'post', body: {'any_key': 'any_value'});
@@ -68,6 +70,17 @@ void main() {
       final response = await sut.request(url: url, method: 'post');
 
       expect(response, null);
+    });
+
+    test('Should return HttpError if post returns 400', () {
+      mockResponse(400, body: '');
+      final future = sut.request(url: url, method: 'post');
+      expect(future, throwsA(HttpError.badRequest));
+    });
+    test('Should return HttpError if post returns 400', () {
+      mockResponse(400);
+      final future = sut.request(url: url, method: 'post');
+      expect(future, throwsA(HttpError.badRequest));
     });
   });
 }

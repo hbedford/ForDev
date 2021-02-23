@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 
 import '../../data/http/http.dart';
+import '../../domain/helpers/helpers.dart';
 
 class HttpAdapter implements HttpClient {
   final Client client;
@@ -22,8 +23,10 @@ class HttpAdapter implements HttpClient {
   Map _handleResponse(Response response) {
     if (response.statusCode == 200) {
       return response.body.isEmpty ? null : jsonDecode(response.body);
-    } else {
+    } else if (response.statusCode == 204) {
       return null;
+    } else {
+      throw HttpError.badRequest;
     }
   }
 }
