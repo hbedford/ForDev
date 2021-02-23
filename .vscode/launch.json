@@ -9,5 +9,5 @@
         },
      
         
-        {"name":"Flutter","request":"launch","type":"dart"}]
+        {"name":"Flutter","request":"launch","type":"dart","program":"lib/main/main.dart"}]
 }
