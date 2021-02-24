@@ -6,6 +6,6 @@ abstract class LoginPresenter {
   Stream<String> get mainErrorStream;
   void validateEmail(String email);
   void validatePasword(String password);
-  void auth();
+  Future<void> auth();
   void dispose();
 }
