@@ -1,3 +1,4 @@
+import 'package:ForDev/ui/components/error_snackbar.dart';
 import 'package:ForDev/ui/components/spinner_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -32,13 +33,7 @@ class _LoginPageState extends State<LoginPage> {
         });
         widget.presenter.mainErrorStream.listen((error) {
           if (error != null) {
-            Scaffold.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.red[900],
-              content: Text(
-                error,
-                textAlign: TextAlign.center,
-              ),
-            ));
+            showErrorMessage(context, error);
           }
         });
         return SingleChildScrollView(
