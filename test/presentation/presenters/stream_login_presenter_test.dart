@@ -1,8 +1,10 @@
-import 'package:ForDev/domain/usecase/authentication.dart';
+import 'package:ForDev/domain/helpers/helpers.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 import 'package:faker/faker.dart';
 
+import 'package:ForDev/domain/entities/entities.dart';
+import 'package:ForDev/domain/usecases/usecases.dart';
 import 'package:ForDev/presentation/presenters/presenters.dart';
 import 'package:ForDev/presentation/protocols/validation.dart';
 
@@ -10,19 +12,32 @@ class ValidationSpy extends Mock implements Validation {}
 
 class AuthenticationSpy extends Mock implements Authentication {}
 
-StreamLoginPresenter sut;
-AuthenticationSpy authentication;
-ValidationSpy validation;
-String email;
-String password;
-PostExpectation mockValidationCall(String field) => when(validation.validate(
-    field: field == null ? anyNamed('field') : field,
-    value: anyNamed('value')));
-void mockValidation({String field, String value}) {
-  mockValidationCall(field).thenReturn(value);
-}
-
 void main() {
+  StreamLoginPresenter sut;
+  AuthenticationSpy authentication;
+  ValidationSpy validation;
+  String email;
+  String password;
+
+  PostExpectation mockValidationCall(String field) => when(validation.validate(
+      field: field == null ? anyNamed('field') : field,
+      value: anyNamed('value')));
+
+  void mockValidation({String field, String value}) {
+    mockValidationCall(field).thenReturn(value);
+  }
+
+  PostExpectation mockAuthenticationCall() => when(authentication.auth(any));
+
+  void mockAuthentication() {
+    mockAuthenticationCall()
+        .thenAnswer((_) async => AccountEntity(faker.guid.guid()));
+  }
+
+  void mockAuthenticationError(DomainError error) {
+    mockAuthenticationCall().thenThrow(error);
+  }
+
   setUp(() {
     validation = ValidationSpy();
     authentication = AuthenticationSpy();
@@ -31,6 +46,7 @@ void main() {
     email = faker.internet.email();
     password = faker.internet.password();
     mockValidation();
+    mockAuthentication();
   });
   test('Should call Validation with correct email', () {
     sut.validateEmail(email);
@@ -92,9 +108,30 @@ void main() {
   test('Should call Authentication with correct values', () async {
     sut.validateEmail(email);
     sut.validatePassword(password);
+
     await sut.auth();
+
     verify(authentication
             .auth(AuthenticationParams(email: email, secret: password)))
         .called(1);
+  });
+  test('Should  emit correct events on Authentication success', () async {
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+
+    expectLater(sut.isLoadingStream, emitsInOrder([true, false]));
+    await sut.auth();
+  });
+
+  test('Should  emit correct events on InvalidCredentialsError', () async {
+    mockAuthenticationError(DomainError.invalidCredentials);
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+
+    expectLater(sut.isLoadingStream, emits(false));
+    sut.mainErrorStream.listen(
+        expectAsync1((error) => expect(error, 'Crendenciais inválidas.')));
+
+    await sut.auth();
   });
 }
