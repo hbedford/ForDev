@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'package:ForDev/domain/helpers/domain_error.dart';
 import 'package:meta/meta.dart';
 
 import '../protocols/protocols.dart';
 import '../../domain/usecases/usecases.dart';
+
+import '../../domain/helpers/helpers.dart';
 
 class LoginState {
   String email;
