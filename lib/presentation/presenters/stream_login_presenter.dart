@@ -24,8 +24,8 @@ class LoginState {
 class StreamLoginPresenter {
   final Validation validation;
   final Authentication authentication;
-  var _controller = StreamController<LoginState>.broadcast();
 
+  var _controller = StreamController<LoginState>.broadcast();
   var _state = LoginState();
 
   Stream<String> get emailErrorStream =>
