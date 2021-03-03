@@ -18,7 +18,7 @@ class PasswordInput extends StatelessWidget {
             ),
             errorText: snapshot.data?.isEmpty == true ? null : snapshot.data),
         obscureText: true,
-        onChanged: presenter.validatePasword,
+        onChanged: presenter.validatePassword,
       ),
     );
   }

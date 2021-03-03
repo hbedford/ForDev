@@ -81,7 +81,7 @@ void main() {
     verify(presenter.validateEmail(email));
     final password = faker.internet.password();
     await tester.enterText(find.bySemanticsLabel('Senha'), password);
-    verify(presenter.validatePasword(password));
+    verify(presenter.validatePassword(password));
   });
   testWidgets('Should present error if email is invalid',
       (WidgetTester tester) async {
